@@ -1,0 +1,8 @@
+-xc++
+-std=c++17
+-Wall
+-Wextra
+-Iinclude
+-Isrc
+-isysroot
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk

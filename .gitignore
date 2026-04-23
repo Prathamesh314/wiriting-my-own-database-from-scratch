@@ -1,0 +1,32 @@
+# Build output
+build/
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+
+# Debug symbols
+*.dSYM/
+*.pdb
+*.ilk
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# clangd cache
+.cache/
+compile_commands.json
+build/
