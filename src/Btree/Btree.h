@@ -2,6 +2,27 @@
 #include <iostream>
 #include <vector>
 
+/*
+Here is ASCII representation of Btree to understand properly
+
+[ K1 | K2 | K3 ]
+  /     |     |    \
+ C0    C1    C2    C3
+
+*/
+
+struct TreeNode{
+    std::vector<int> keys;
+    std::vector<TreeNode*> children;
+    int degree;
+    bool isLeaf;
+
+    TreeNode(int _degree) {
+        this->degree = _degree;
+        this->isLeaf = true;
+    }
+};
+
 namespace Btree {
     class Btree {
         public:
@@ -13,9 +34,11 @@ namespace Btree {
     class BtreeImpl : public Btree {
         private:
             int degree;
+            TreeNode *root;
         public:
             BtreeImpl( int degree) {
                 this->degree = degree;
+                this->root = new TreeNode(degree); 
                 std::cout << "BtreeImpl constructor called!" << std::endl;
             }
 
