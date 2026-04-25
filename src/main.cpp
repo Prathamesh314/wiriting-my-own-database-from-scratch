@@ -1,10 +1,8 @@
-#include <iostream>
 #include "Btree/Btree.h"
-
-using namespace std;
+#include "Logger.h"
 
 int main(){
-    cout<<"Hello World"<<endl;
+    Logger::info("Hello World");
     int degree = 3;
     Btree::Btree *btree = new Btree::BtreeImpl(degree);
     btree->insert(1);
@@ -14,6 +12,9 @@ int main(){
     //vector<int> keys = {1, 2, 3, 4, 5};
     //btree->build(keys);
     btree->printTree();
+
+    TreeNode* keynode = btree->findKey(5);
+    Logger::info(keynode);
     delete btree;
     return 0;
 }

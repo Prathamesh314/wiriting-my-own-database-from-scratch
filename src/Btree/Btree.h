@@ -1,10 +1,13 @@
 #pragma once
 
 #include <algorithm>
-#include <iostream>
-#include <string>
+#include <cstddef>
+#include <sstream>
 #include <stdexcept>
+#include <string>
 #include <vector>
+
+#include "Logger.h"
 
 /*
 Here is ASCII representation of Btree to understand properly
@@ -60,11 +63,29 @@ struct TreeNode{
         children[i]->insertNonFull(key);
     }
 
+    TreeNode* findKey(int key) {
+        int i = 0;
+        while (i < int(keys.size()) and key > keys[i]){
+            i++;
+        }
+
+        if (i < int(keys.size()) and key == keys[i]){
+            return this;
+        }
+
+        if(this->isLeaf){
+            return nullptr;
+        }
+
+        return this->children[i]->findKey(key);
+    }
+
     // Precondition: this node is NOT full, children[i] IS full.
     void splitChild(int i) {
         TreeNode* full = children[i];
         int medianIndex = (degree - 1) / 2;
         int medianKey = full->keys[medianIndex];
+        Logger::debug("splitChild: promoting median ", medianKey, " (child idx ", i, ")");
 
         TreeNode* rightSibling = new TreeNode(degree);
         rightSibling->isLeaf = full->isLeaf;
@@ -93,6 +114,7 @@ namespace Btree {
         public:
             virtual ~Btree() = default;
             virtual void insert(int key) = 0;
+            virtual TreeNode* findKey(int key) = 0;
             virtual void build(std::vector<int>& keys) = 0;
             virtual void printTree() = 0;
     };
@@ -108,8 +130,8 @@ namespace Btree {
 
                 }
                 this->degree = degree;
-                this->root = new TreeNode(degree); 
-                std::cout << "BtreeImpl constructor called!" << std::endl;
+                this->root = new TreeNode(degree);
+                Logger::debug("BtreeImpl constructor called (degree=", degree, ")");
             }
 
             void insert(int key) override {
@@ -127,19 +149,28 @@ namespace Btree {
                 }
 
                 root->insertNonFull(key);
-                std::cout << "Inserting " << key << " in btree" << std::endl;
+                Logger::info("Inserted ", key, " into btree");
+            }
+            
+            TreeNode* findKey(int key) override {
+                if (!root) {
+                    Logger::warn("Tree is empty; cannot find key: ", key);
+                    return nullptr;
+                }
+
+                return root->findKey(key);
             }
 
             void build(std::vector<int>& keys) override {
-                std::cout << "Building btree from keys" << std::endl;
+                Logger::info("Building btree from ", keys.size(), " keys");
                 for (auto it : keys) {
-                    std::cout << "Key: " << it << std::endl;
+                    Logger::debug("  key: ", it);
                 }
             }
 
-            void printTree() override{
+            void printTree() override {
                 if (!root) {
-                    std::cout << "(empty tree)" << std::endl;
+                    Logger::print("(empty tree)");
                     return;
                 }
                 printNode(root, 0);
@@ -149,12 +180,14 @@ namespace Btree {
             void printNode(TreeNode* node, int depth) {
                 if (!node) return;
 
-                std::cout << std::string(depth * 4, ' ') << "[";
+                std::ostringstream line;
+                line << std::string(depth * 4, ' ') << "[";
                 for (size_t i = 0; i < node->keys.size(); ++i) {
-                    if (i > 0) std::cout << " | ";
-                    std::cout << node->keys[i];
+                    if (i > 0) line << " | ";
+                    line << node->keys[i];
                 }
-                std::cout << "]" << (node->isLeaf ? " (leaf)" : "") << std::endl;
+                line << "]" << (node->isLeaf ? " (leaf)" : "");
+                Logger::print(line.str());
 
                 for (auto* child : node->children) {
                     printNode(child, depth + 1);
@@ -164,7 +197,7 @@ namespace Btree {
         public:
 
             ~BtreeImpl() override {
-                std::cout << "BtreeImpl destructor called!" << std::endl;
+                Logger::debug("BtreeImpl destructor called");
             }
     };
 }
