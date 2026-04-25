@@ -1,20 +1,19 @@
 #include "Btree/Btree.h"
-#include "Logger.h"
 
 int main(){
-    Logger::info("Hello World");
-    int degree = 3;
-    Btree::Btree *btree = new Btree::BtreeImpl(degree);
-    btree->insert(1);
-    btree->insert(2);
-    btree->insert(3);
-    btree->insert(4);
-    //vector<int> keys = {1, 2, 3, 4, 5};
-    //btree->build(keys);
+    int degree = 5;
+    Btree::Btree* btree = new Btree::BtreeImpl(degree);
+    for (int k : {10, 20, 30, 40, 50, 60, 70, 80, 90}) btree->insert(k);
     btree->printTree();
 
-    TreeNode* keynode = btree->findKey(5);
-    Logger::info(keynode);
-    delete btree;
+    btree->deleteKey(30);   // leaf delete (Case 1)
+    btree->printTree();
+
+    btree->deleteKey(50);   // probably internal delete (Case 2)
+    btree->printTree();
+
+    btree->deleteKey(70);   // may trigger borrow / merge
+    btree->printTree();
+
     return 0;
 }
