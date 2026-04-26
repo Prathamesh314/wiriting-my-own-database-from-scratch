@@ -20,7 +20,8 @@ int main(){
     const char* text = "testing";
     const std::byte* content = reinterpret_cast<const std::byte*>(text);
 
-    FileStorage::saveDataToFile("sample.txt", content, 7);
+    // FileStorage::saveDataToFile("sample.txt", content, 7);
+    FileStorage::saveDataToFileAtomically("sample1.txt", content, 7);
 
     return 0;
 }
