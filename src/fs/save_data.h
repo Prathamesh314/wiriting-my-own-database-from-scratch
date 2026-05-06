@@ -28,8 +28,9 @@ namespace FileStorage {
     inline void saveDataToFileAtomically(const std::string& filepath, const std::byte* content, std::size_t size) {
         // to save data atomically, we need to follow few steps
         // 1. write data to a temporary file
-        // 2. rename the temporary file to the original file
-        // 3. remove temporary file
+        // 2. flush the data to disk before renaming it
+        // 3. rename the temporary file to the original file
+        // 4. remove temporary file
 
 
         static std::mt19937_64 gen(std::random_device{}());
@@ -38,6 +39,10 @@ namespace FileStorage {
         std::string temporary_filepath = filepath + ".tmp." + std::to_string(dist(gen));
 
         saveDataToFile(temporary_filepath, content, size);
+
+        // flush the data to disk before renaming it
+        std::ofstream file(temporary_filepath, std::ios::binary);
+        file.flush();
 
         // if anything below throws or fails before we cancel, remove the temp file
         auto cleanup = util::make_defer([&]{ std::remove(temporary_filepath.c_str()); });
